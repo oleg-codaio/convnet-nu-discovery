@@ -1,7 +1,8 @@
 convnet-nu-discovery
 ====================
 
-Based off cuda-convnet2, this framework for fast convolutional neural networks is ported to run on Northeastern University's Discovery Cluster.
+Based off cuda-convnet2, this framework for fast convolutional neural networks
+is ported to run on Northeastern University's Discovery Cluster.
 
 
 Still in progress!

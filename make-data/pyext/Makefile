@@ -24,9 +24,10 @@ CC=g++
 OUT_DIR=./bin/$(OUT_SUFFIX)
 
 PYTHON_VERSION=$(shell python -V 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
-LINK_LIBS := -L$(CUDA_INSTALL_PATH)/lib64 `pkg-config --libs python` `pkg-config --libs opencv` -lpthread
+#LINK_LIBS := -L$(CUDA_INSTALL_PATH)/lib64 `pkg-config --libs python` `pkg-config --libs opencv` -lpthread
+LINK_LIBS := -L$(CUDA_INSTALL_PATH)/lib64 `pkg-config --libs opencv` -lpthread -lpython$(PYTHON_VERSION)
 
-INCLUDES += -I$(PYTHON_INCLUDE_PATH) 
+INCLUDES += -I$(PYTHON_INCLUDE_PATH) -I$(OPENCV_INCLUDE_PATH)
 OUT_FILE=_MakeDataPyExt.so
 
 all: dir classes $(OUT_FILE)

@@ -69,8 +69,8 @@ OBJDIR := ./obj/$(DBG)
 ########## USER STUFF ###########
 PYTHON_VERSION=$(shell python -V 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
 MODELNAME := _ConvNet
-LDFLAGS   += -lpthread -ljpeg -lpython$(PYTHON_VERSION) -L../util -lutilpy -L../nvmatrix -lnvmatrix -L../cudaconv3 -lcudaconv -lcublas -Wl,-rpath=./util -Wl,-rpath=./nvmatrix -Wl,-rpath=./cudaconv3 
-INCLUDES      := -I$(CUDA_INC_PATH) -I $(CUDA_SDK_PATH)/common/inc -I./include -I$(PYTHON_INCLUDE_PATH) -I$(NUMPY_INCLUDE_PATH) 
+LDFLAGS   += -lpthread -L"$(LIB_JPEG_PATH)" -lpython$(PYTHON_VERSION) -L../util -lutilpy -L../nvmatrix -lnvmatrix -L../cudaconv3 -lcudaconv -lcublas -Wl,-rpath=./util -Wl,-rpath=./nvmatrix -Wl,-rpath=./cudaconv3 
+INCLUDES      := -I$(CUDA_INC_PATH) -I$(CUDA_SDK_PATH)/common/inc -I./include -I$(PYTHON_INCLUDE_PATH) -I$(NUMPY_INCLUDE_PATH) -I$(LIB_JPEG_PATH)
 
 DEFINES := -DNUMPY_INTERFACE
 

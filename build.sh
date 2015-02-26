@@ -59,7 +59,7 @@ export LD_LIBRARY_PATH=$CUDA_INSTALL_PATH/lib64:$LIB_JPEG_PATH:$LD_LIBRARY_PATH
 export CUDA_SDK_PATH=$CUDA_INSTALL_PATH/samples
 export PATH=$PATH:$CUDA_INSTALL_PATH/bin
 
-cd jpeg-8 && ./configure && make && cd ..
+cd jpeg-8 && ./configure && make clean && make -j $* && cd ..
 cd util && make numpy=1 -j $* && cd ..
 cd nvmatrix && make -j $* && cd ..
 cd cudaconv3 && make -j $* && cd ..

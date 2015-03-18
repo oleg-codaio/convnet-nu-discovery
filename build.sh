@@ -27,11 +27,11 @@ set -e
 # 
 # (it'll almost certainly be under /usr)
 
-# Load the needed modules for the Discovery Cluster.
-module load python-2.7.5
-module load cuda-6.5
-module load atlas-sse3-3.8.4-2
-module load opencv
+# Make sure we've loaded the needed modules for the Discovery Cluster.
+if module list 2>&1 | grep -q "No Modulefiles Currently Loaded"; then
+    echo "Please run \"source load_modules.sh\" before running this script."
+    exit 1
+fi
 
 # CUDA toolkit installation directory.
 export CUDA_INSTALL_PATH=/shared/apps/cuda6.5

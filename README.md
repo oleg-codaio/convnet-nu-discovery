@@ -27,11 +27,15 @@ username). This may take a couple hours.
 
     source ./load_modules.sh
     cd make-data
-    ./run.sh vaskevich.o
+    ./make-data.sh vaskevich.o
 
 Training
 --------
+First, install some more dependencies:
+
+    pip install --user pillow
+
 To train the neural network, run a command like this:
 
-    python convnet.py --data-path /scratch/vaskevich.o/batch/ --train-range 0-417 --test-range 1000-1016 --save-path /scratch/vaskevich.o/training --epochs 90 --layer-def layers/layers-imagenet-1gpu.cfg --layer-params layers/layer-params-imagenet-1gpu.cfg --data-provider image --inner-size 224 --gpu 0 --mini 128 --test-freq 201 --color-noise 0.1
+    ./run.sh
 

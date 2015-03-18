@@ -27,7 +27,7 @@ username). This may take a couple hours.
 
     source ./load_modules.sh
     cd make-data
-    python make-data.py --src-dir /scratch/vaskevich.o/data --tgt-dir /scratch/vaskevich.o/batches
+    ./run.sh vaskevich.o
 
 Training
 --------

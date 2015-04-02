@@ -7,6 +7,25 @@ As part of coursework for EECE 5640: High-Performance Computing, we are adapting
 this framework for use on NU's Discovery Cluster, with the intention to increase
 performance via CUDA, OpenMP and MPI.
 
+Loading modules
+---------------
+To make things easier, add these lines to your ~/.bashrc:
+
+    module load gnu-4.4-compilers 
+    module load fftw-3.3.3
+    module load platform-mpi
+    module load gnu-4.8.1-compilers
+    module load python-2.7.5
+    module load oracle_java_1.7u40
+    module load atlas-sse3-3.8.4-2
+    module load matlab_dce_2013b
+    module load cuda-6.5
+    module load ant-1.9.3
+    module load apache-maven-3.2.3
+    module load protobuf-2.6.1
+    module load vtk-5.10.1
+    module load opencv
+
 Compiling
 ---------
 This framework is already preconfigured to run on the Discovery cluster. To
@@ -23,7 +42,10 @@ you may want to use `tmux` to download the data in the background. Save it into
 directory.
 
 Now, generate the training batches (substitute `vaskevich.o` with your
-username). This may take a couple hours.
+username). This may take a couple hours. For this, it is recommended that you
+use `tmux` to avoid losing your progress in case you get logged out or need to
+disconnect. In that case, simply run `tmux a` to reattach to your session after
+logging back into the cluster.
 
     source ./load_modules.sh
     cd make-data
@@ -31,11 +53,18 @@ username). This may take a couple hours.
 
 Training
 --------
-First, install some more dependencies:
+First, connect to a login node and launch `tmux`. Then open an interactive
+session on a GPU node.
 
-    pip install --user pillow
+    bsub -Is -XF -n 32 -q par-gpu -R span[ptile=32] /bin/bash
 
-To train the neural network, run a command like this:
+To train the neural network, use the provided script.
 
     ./run.sh
+
+You may need to tweak it to meet your requirements.
+
+Further reading
+---------------
+See [cuda-convnet2](https://code.google.com/p/cuda-convnet2/wiki/TrainingExample).
 

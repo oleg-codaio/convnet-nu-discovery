@@ -3,6 +3,7 @@
 *.lo
 *.o
 *.obj
+*.pyc
 
 # Precompiled Headers
 *.gch
@@ -26,3 +27,20 @@
 *.exe
 *.out
 *.app
+
+# libjpeg
+jpeg-8/.deps/
+jpeg-8/.libs/
+jpeg-8/Makefile
+jpeg-8/cjpeg
+jpeg-8/config.log
+jpeg-8/config.status
+jpeg-8/djpeg
+jpeg-8/jconfig.h
+jpeg-8/jpegtran
+jpeg-8/libtool
+jpeg-8/output/
+jpeg-8/rdjpgcom
+jpeg-8/stamp-h1
+jpeg-8/wrjpgcom
+

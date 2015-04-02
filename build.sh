@@ -59,10 +59,33 @@ export LD_LIBRARY_PATH=$CUDA_INSTALL_PATH/lib64:$LIB_JPEG_PATH:$LD_LIBRARY_PATH
 export CUDA_SDK_PATH=$CUDA_INSTALL_PATH/samples
 export PATH=$PATH:$CUDA_INSTALL_PATH/bin
 
-cd jpeg-8 && ./configure && make clean && make -j $* && cd ..
-cd util && make numpy=1 -j $* && cd ..
-cd nvmatrix && make -j $* && cd ..
-cd cudaconv3 && make -j $* && cd ..
-cd cudaconvnet && make -j $* && cd ..
-cd make-data/pyext && make -j $* && cd ../..
+cd jpeg-8
+mkdir -p output
+./configure --prefix="$(pwd)/output"
+make clean
+make -j $*
+make install
+cd output/lib
+[ ! -f libjpeg.so.62 ] && ln -s libjpeg.so.8 libjpeg.so.62
+cd ../../..
+
+cd util
+make numpy=1 -j $*
+cd ..
+
+cd nvmatrix
+make -j $*
+cd ..
+
+cd cudaconv3
+make -j $*
+cd ..
+
+cd cudaconvnet
+make -j $*
+cd ..
+
+cd make-data/pyext
+make -j $*
+cd ../..
 

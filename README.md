@@ -56,11 +56,11 @@ Training
 First, connect to a login node and launch `tmux`. Then open an interactive
 session on a GPU node.
 
-    bsub -Is -XF -n 32 -q par-gpu -R span[ptile=32] /bin/bash
+    bsub -Is -n 32 -q par-gpu -R span[ptile=32] /bin/bash
 
 To train the neural network, use the provided script.
 
-    ./run.sh
+    ./run.sh vaskevich.o
 
 You may need to tweak it to meet your requirements.
 

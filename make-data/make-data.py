@@ -127,6 +127,7 @@ if __name__ == "__main__":
         print "Building training set image list (this can take 10-20 minutes)..."
         sys.stdout.flush()
     
+        t = time()
         train_jpeg_files = []
         for i,st in enumerate(synset_tars):
             if i % 100 == 0:
@@ -137,7 +138,7 @@ if __name__ == "__main__":
             
         shuffle(train_jpeg_files)
         train_labels = [[labels_dic[jpeg.name[:9]]] for jpeg in train_jpeg_files]
-        print "done"
+        print "done (%.2f sec)" % time() - t
     
         # Write training batches
         i = write_batches(args.tgt_dir, 'training', 0, train_labels, train_jpeg_files)

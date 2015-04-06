@@ -4,7 +4,7 @@
 #BSUB -e error_file
 #BSUB -n 8
 #BSUB -q ht-10g
-#BSUB -cwd temp_dir 
+#BSUB -cwd 
 ######## THIS IS A TEMPLATE FILE FOR TCP ENABLED MPI RUNS ON THE DISCOVERY CLUSTER ########
 #### #BSUB -n has a value equal to the given value for the -np option ####
 # prefix for next run is entered below
@@ -14,11 +14,12 @@
 #### "pwd"
 #### IF you stage your files this is your run directory in the high speed scratch space mounted 
 #### across all compute nodes
-work=temp_dir
+work=""
+scratch_username=""
 #####################################################
 ########DO NOT EDIT ANYTHING BELOW THIS LINE#########
 #####################################################
-cd $work
+cd "$work"
 tempfile1=hostlistrun
 tempfile2=hostlist-tcp
 echo $LSB_MCPU_HOSTS > $tempfile1
@@ -39,15 +40,16 @@ done
 ###### DO NOT CHANGE ANYTHING ELSE BELOW FOR mpirun OPTIONS
 ###### MAKE SURE THAT THE "#BSUB -n" is equal to the "-np" number below. IN this example it is 8.
 
-mpirun -np 8 -prot -TCP -lsf make-data.py --src-dir /scratch/scratch_dir/data --tgt-dir /scratch/scratch_dir/batch
+mpirun -np 8 -prot -TCP -lsf make-data.py --src-dir "/scratch/$scratch_username/data" --tgt-dir "/scratch/$scratch_username/batch"
 
 #/home/nroy/mpi4py-test/helloworld.py
 # any clean up tasks and file migration code is entered below
 #####################################################
 ########DO NOT EDIT ANYTHING BELOW THIS LINE#########
 #####################################################
-rm $work/$tempfile1
-rm $work/$tempfile2
+rm "$work/$tempfile1"
+rm "$work/$tempfile2"
 #####################################################
 ########DO NOT EDIT ANYTHING ABOVE THIS LINE#########
 #####################################################
+

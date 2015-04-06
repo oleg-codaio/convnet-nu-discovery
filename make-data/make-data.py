@@ -121,6 +121,10 @@ def write_batches(target_dir, name, start_batch_num, labels, jpeg_files):
     return i + 1
 
 if __name__ == "__main__":
+    mComm.barrier()
+    START_TIME = None
+    if mRank == 0:
+        START_TIME = time()
     # TODO(sussman.sa): Parse only on master and broadcast.
     parser = argp.ArgumentParser()
     parser.add_argument('--src-dir', help='Directory containing ILSVRC2012_img_train.tar, ILSVRC2012_img_val.tar, and ILSVRC2012_devkit_t12.tar.gz', required=True)
@@ -180,7 +184,7 @@ if __name__ == "__main__":
             local_train_jpeg_files += [st.extractfile(m) for m in st.getmembers()]
             st.close()
         
-        mComm.barrier()
+        #mComm.barrier()
 
         #if mRank == 0:
         #    train_jpeg_files = [item for sublist in train_jpeg_files for item in sublist]
@@ -190,7 +194,7 @@ if __name__ == "__main__":
 
         print "Total JPEG files found on node %d: %d; sample label: %s" % (mRank, len(local_train_jpeg_files), local_train_labels[0])
     
-        mComm.barrier()
+        #mComm.barrier()
 
         # Write training batches
         #if mRank == 0:
@@ -201,9 +205,13 @@ if __name__ == "__main__":
         #    scatterable_train_jpeg_files = None
 #        train_labels = mComm.scatter(scatterable_train_labels, root=0)
 #        train_jpeg_files = mComm.scatter(scatterable_train_jpeg_files, root=0)
-        mComm.barrier()
+        #mComm.barrier()
         i = write_batches(args.tgt_dir, 'training', 0, local_train_labels, local_train_jpeg_files)
-        mComm.barrier()
+    mComm.barrier()
+    if mRank == 0:
+        END_TIME = time()
+        print "Overall time is: %.2f" % (END_TIME - START_TIME)
+        sys.exit(1)
     
     # Write validation batches. Doesn't take long, so just do it on master
     mComm.barrier()
@@ -224,4 +232,6 @@ if __name__ == "__main__":
         pickle(meta_file, meta)
         print "Wrote %s" % meta_file
         print "All done! ILSVRC 2012 batches are in %s" % args.tgt_dir
+        #END_TIME = time()
+        #print "Overall time is: %.2f" % (END_TIME - START_TIME)
 

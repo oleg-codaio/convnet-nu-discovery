@@ -2,9 +2,9 @@
 #BSUB -J convnet-make-data 
 #BSUB -o output_file
 #BSUB -e error_file
-#BSUB -n 8
+#BSUB -n 16
 #BSUB -q ht-10g
-#BSUB -cwd 
+#BSUB -cwd /home/sussman.sa/project/convnet-nu-discovery/make-data
 ######## THIS IS A TEMPLATE FILE FOR TCP ENABLED MPI RUNS ON THE DISCOVERY CLUSTER ########
 #### #BSUB -n has a value equal to the given value for the -np option ####
 # prefix for next run is entered below
@@ -14,8 +14,8 @@
 #### "pwd"
 #### IF you stage your files this is your run directory in the high speed scratch space mounted 
 #### across all compute nodes
-work=""
-scratch_username=""
+work="/home/sussman.sa/project/convnet-nu-discovery/make-data"
+scratch_username="vaskevich.o"
 #####################################################
 ########DO NOT EDIT ANYTHING BELOW THIS LINE#########
 #####################################################
@@ -40,7 +40,7 @@ done
 ###### DO NOT CHANGE ANYTHING ELSE BELOW FOR mpirun OPTIONS
 ###### MAKE SURE THAT THE "#BSUB -n" is equal to the "-np" number below. IN this example it is 8.
 
-mpirun -np 8 -prot -TCP -lsf make-data.py --src-dir "/scratch/$scratch_username/data" --tgt-dir "/scratch/$scratch_username/batch"
+mpirun -np 16 -prot -TCP -lsf make-data.py --src-dir "/scratch/$scratch_username/data" --tgt-dir "/scratch/$scratch_username/batch"
 
 #/home/nroy/mpi4py-test/helloworld.py
 # any clean up tasks and file migration code is entered below

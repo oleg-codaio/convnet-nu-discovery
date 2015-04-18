@@ -141,6 +141,9 @@ if __name__ == "__main__":
     
         # Write training batches
         i = write_batches(args.tgt_dir, 'training', 0, train_labels, train_jpeg_files)
+
+    END_TIME = time()
+    print "Time (without validation) is: %.2f" % (END_TIME - START_TIME)
     
     # Write validation batches
     val_batch_start = int(math.ceil((i / 1000.0))) * 1000

@@ -212,34 +212,24 @@ if __name__ == "__main__":
         #mComm.barrier()
         i = write_batches(args.tgt_dir, 'training', 0, local_train_labels, local_train_jpeg_files)
     mComm.barrier()
-    if mRank == 0:
-        END_TIME = time()
-        print "Overall time is: %.2f" % (END_TIME - START_TIME)
-        sys.exit(1)
+    #if mRank == 0:
+    #    END_TIME = time()
+    #    print "Overall time is: %.2f" % (END_TIME - START_TIME)
     
     # Write validation batches. Doesn't take long, so just do it on master
     mComm.barrier()
-    train_jpeg_files = mComm.gather(local_train_jpeg_files)
-    if mRank == 0:
-        i = len(train_jpeg_files)
-        val_batch_start = int(math.ceil((i / 1000.0))) * 1000
-        with open_tar(ILSVRC_VALIDATION_TAR, 'validation tar') as tf:
-            validation_jpeg_files = sorted([tf.extractfile(m) for m in tf.getmembers()], key=lambda x:x.name)
-            write_batches(args.tgt_dir, 'validation', val_batch_start, validation_labels, validation_jpeg_files)
-    
+    #train_jpeg_files = mComm.gather(local_train_jpeg_files)
+    i = len(local_train_jpeg_files)
+    val_batch_start = int(math.ceil((i / 1000.0))) * 1000 * mSize
+    with open_tar(ILSVRC_VALIDATION_TAR, 'validation tar') as tf:
+        validation_jpeg_files = split_seq(sorted([tf.extractfile(m) for m in tf.getmembers()], key=lambda x:x.name), mSize)
+        #mComm.barrier()
+        #local_validation_jpeg_files = mComm.scatter(validation_jpeg_files, root=0)
+        local_validation_jpeg_files = validation_jpeg_files[mRank]
+        write_batches(args.tgt_dir, 'validation', val_batch_start, validation_labels, local_validation_jpeg_files)
+   
     # Write meta file
-    meta = unpickle('input_meta')
-    meta_file = os.path.join(args.tgt_dir, 'batches.meta')
-    meta.update({'batch_size': OUTPUT_BATCH_SIZE,
-                 'num_vis': OUTPUT_IMAGE_SIZE**2 * 3,
-                 'label_names': label_names})
-    pickle(meta_file, meta)
-    print "Wrote %s" % meta_file
-    print "All done! ILSVRC 2012 batches are in %s" % args.tgt_dir
-
-    END_TIME = time()
-    print "Overall time is: %.2f" % (END_TIME - START_TIME)
-        # Write meta file
+    if mRank == 0:
         meta = unpickle('input_meta')
         meta_file = os.path.join(args.tgt_dir, 'batches.meta')
         meta.update({'batch_size': OUTPUT_BATCH_SIZE,
@@ -248,6 +238,6 @@ if __name__ == "__main__":
         pickle(meta_file, meta)
         print "Wrote %s" % meta_file
         print "All done! ILSVRC 2012 batches are in %s" % args.tgt_dir
-        #END_TIME = time()
-        #print "Overall time is: %.2f" % (END_TIME - START_TIME)
+        END_TIME = time()
+        print "Overall time is: %.2f" % (END_TIME - START_TIME)
 

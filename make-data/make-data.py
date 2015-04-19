@@ -197,10 +197,6 @@ if __name__ == "__main__":
         #mComm.barrier()
 
         # Write training batches
-        i = write_batches(args.tgt_dir, 'training', 0, train_labels, train_jpeg_files)
-
-    END_TIME = time()
-    print "Time (without validation) is: %.2f" % (END_TIME - START_TIME)
         #if mRank == 0:
         #    scatterable_train_labels = split_seq(train_labels, mSize)
         #    scatterable_train_jpeg_files = split_seq(train_jpeg_files, mSize)
@@ -211,12 +207,12 @@ if __name__ == "__main__":
 #        train_jpeg_files = mComm.scatter(scatterable_train_jpeg_files, root=0)
         #mComm.barrier()
         i = write_batches(args.tgt_dir, 'training', 0, local_train_labels, local_train_jpeg_files)
-    mComm.barrier()
     #if mRank == 0:
     #    END_TIME = time()
     #    print "Overall time is: %.2f" % (END_TIME - START_TIME)
     
     # Write validation batches. Doesn't take long, so just do it on master
+    mComm.barrier()
     #train_jpeg_files = mComm.gather(local_train_jpeg_files)
     i = len(local_train_jpeg_files)
     val_batch_start = int(math.ceil((i / 1000.0))) * 1000 * mSize

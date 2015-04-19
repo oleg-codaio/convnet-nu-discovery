@@ -1,13 +1,18 @@
 #!/bin/sh
 #
-# Times the code.
+# Times the code and sends a text message to two numbers once finished.
 
 set -e
 
-if [[ $# -ne 1 || -z "$1" ]]; then
-    echo "usage: $0 <username>"
+if [[ $# -ne 5 || -z "$1" ]]; then
+    echo "usage: $0 <username> <auth_id> <auth_token> <number_one> <number_two>"
     exit 1
 fi
+
+auth_id=$2
+auth_token=$3
+number_one=$4
+number_two=$5
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Running from $DIR in scratch folder of user '$1'"
@@ -48,6 +53,13 @@ for bsub_n_and_ptile in 1,1 2,1 2,2 4,1 4,2, 4,4 8,1 8,2 8,4 8,8 16,2 16,4 16,8 
     done
 done
 IFS=$OLDIFS
+
+# Send text messages!
+for dest in $number_one $number_two; do
+    echo "Sending text message to $dest"
+    wget --no-check-certificate --post-data="{\"src\": \"15744408596\", \"dst\": \"$dest\", \"text\": \"make-data has finished!!!! :)\"}" --user="$auth_id" --password="$auth_token" --header="Content-Type: application/json" "https://api.plivo.com/v1/Account/$auth_id/Message/"
+    sleep 1
+done
 
 echo "Done!"
 

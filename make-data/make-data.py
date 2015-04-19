@@ -217,7 +217,6 @@ if __name__ == "__main__":
     #    print "Overall time is: %.2f" % (END_TIME - START_TIME)
     
     # Write validation batches. Doesn't take long, so just do it on master
-    mComm.barrier()
     #train_jpeg_files = mComm.gather(local_train_jpeg_files)
     i = len(local_train_jpeg_files)
     val_batch_start = int(math.ceil((i / 1000.0))) * 1000 * mSize
@@ -229,6 +228,7 @@ if __name__ == "__main__":
         write_batches(args.tgt_dir, 'validation', val_batch_start, validation_labels, local_validation_jpeg_files)
    
     # Write meta file
+    mComm.barrier()
     if mRank == 0:
         meta = unpickle('input_meta')
         meta_file = os.path.join(args.tgt_dir, 'batches.meta')

@@ -14,7 +14,7 @@
 
 INCLUDES := -I./include
 COMMONFLAGS :=
-CC_ARGS := -fopenmp -w 
+CC_ARGS := -fopenmp -w -g
 
 ifndef debug
 	CC_ARGS += -O3

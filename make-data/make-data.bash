@@ -4,7 +4,7 @@
 #BSUB -e error_file
 #BSUB -n 16
 #BSUB -q ht-10g
-#BSUB -cwd /home/sussman.sa/project/convnet-nu-discovery/make-data
+#BSUB -cwd /home/vaskevich.o/eece5640/_project/convnet-nu-discovery/make-data
 ######## THIS IS A TEMPLATE FILE FOR TCP ENABLED MPI RUNS ON THE DISCOVERY CLUSTER ########
 #### #BSUB -n has a value equal to the given value for the -np option ####
 # prefix for next run is entered below
@@ -14,7 +14,7 @@
 #### "pwd"
 #### IF you stage your files this is your run directory in the high speed scratch space mounted 
 #### across all compute nodes
-work="/home/sussman.sa/project/convnet-nu-discovery/make-data"
+work="/home/vaskevich.o/eece5640/_project/convnet-nu-discovery/make-data"
 scratch_username="vaskevich.o"
 #####################################################
 ########DO NOT EDIT ANYTHING BELOW THIS LINE#########

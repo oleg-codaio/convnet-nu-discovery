@@ -16,6 +16,7 @@
 
 #include "../include/pyext.h"
 #include <omp.h>
+#include <cstdio>
 
 using namespace std;
 
@@ -52,12 +53,12 @@ PyObject* resizeJPEG(PyObject *self, PyObject *args) {
     for (int t = 0; t < num_imgs; ++t) {
         //int start_img = t * num_imgs_per_thread;
         //int end_img = min(num_imgs, (t+1) * num_imgs_per_thread);
+        cout << "calling makeJPEG for " << t << " on worker " << omp_get_thread_num() << endl;
         makeJPEG((PyObject*)pyListSrc, t, tgtImgSize, cropToSquare, pyListTgt);
 
         //threads[t] = new DecoderThread((PyObject*)pyListSrc, start_img, end_img, tgtImgSize, cropToSquare);
         //threads[t]->start();
     }
-    PyList_Append(pyListTgt, (PyObject*)pyListSrc);
 /*
     PyObject* pyListTgt = PyList_New(0);
     #pragma omp parallel for
@@ -141,6 +142,9 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
 
     char* output_jpeg_buffer_ptr = reinterpret_cast<char*>(&_output_jpeg_buffer[0]);
     PyObject* pyStr = PyString_FromStringAndSize(output_jpeg_buffer_ptr, _output_jpeg_buffer.size());
-    PyList_Append(_py_list_tgt, pyStr);
+    #pragma omp critical
+    {
+        PyList_Append(_py_list_tgt, pyStr);
+    }
     Py_DECREF(pyStr);
 }

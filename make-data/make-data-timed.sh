@@ -23,7 +23,7 @@ for n in 1 2 4 8 16 32 64 128 256 512; do
     mkdir -p "/scratch/$1/batch"
     rm -rf "/scratch/$1/batch/*"
 
-    sed -i -E "s/NUM_WORKER_THREADS\s+=\s+[0-9]+/NUM_WORKER_THREADS=$n]" \
+    sed -i -E "s/NUM_WORKER_THREADS\s+=\s+[0-9]+/NUM_WORKER_THREADS=$n/" \
         make-data.py
 
     echo "Running with $n threads..."
@@ -31,7 +31,7 @@ for n in 1 2 4 8 16 32 64 128 256 512; do
     while bjobs -w | grep -qi "convnet-make-data"; do
         sleep 1
     done
-    time=$(cat output_file | grep "Overall time is:" | sed -r "s/.*([0-9]+\.[0-9]+)/\1")
+    time=$(cat output_file | grep "Overall time is:" | sed -r "s/.*\s([0-9]+\.[0-9]+)/\1/")
     echo "... time: $time s"
 done
 

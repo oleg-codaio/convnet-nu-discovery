@@ -102,6 +102,7 @@ def write_batches(target_dir, name, start_batch_num, labels, jpeg_files):
     return i + 1
 
 if __name__ == "__main__":
+    START_TIME = time()
     parser = argp.ArgumentParser()
     parser.add_argument('--src-dir', help='Directory containing ILSVRC2012_img_train.tar, ILSVRC2012_img_val.tar, and ILSVRC2012_devkit_t12.tar.gz', required=True)
     parser.add_argument('--tgt-dir', help='Directory to output ILSVRC 2012 batches suitable for cuda-convnet to train on.', required=True)
@@ -155,3 +156,5 @@ if __name__ == "__main__":
     pickle(meta_file, meta)
     print "Wrote %s" % meta_file
     print "All done! ILSVRC 2012 batches are in %s" % args.tgt_dir
+    END_TIME = time()
+    print "Overall time: %s" % (END_TIME - START_TIME)

@@ -1,5 +1,5 @@
-error_file
-output_file
+error_file*
+output_file*
 hostlist-tcp
-hostlisttcp
+hostlistrun
 

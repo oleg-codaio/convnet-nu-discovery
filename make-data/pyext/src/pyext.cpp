@@ -43,62 +43,24 @@ PyObject* resizeJPEG(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    DecoderThread* threads[numThreads];
     int num_imgs = PyList_GET_SIZE(pyListSrc);
-    //int num_imgs_per_thread = DIVUP(num_imgs, numThreads);
     PyObject* pyListTgt = PyList_New(0);
     omp_set_num_threads(numThreads);
     #pragma omp parallel for
     for (int t = 0; t < num_imgs; ++t) {
-        //int start_img = t * num_imgs_per_thread;
-        //int end_img = min(num_imgs, (t+1) * num_imgs_per_thread);
         makeJPEG((PyObject*)pyListSrc, t, tgtImgSize, cropToSquare, pyListTgt);
-
-        //threads[t] = new DecoderThread((PyObject*)pyListSrc, start_img, end_img, tgtImgSize, cropToSquare);
-        //threads[t]->start();
     }
-/*
-    PyObject* pyListTgt = PyList_New(0);
-    #pragma omp parallel for
-    for (int t = 0; t < numThreads; ++t) {
-        threads[t]->join();
-        PyList_Append(pyListTgt, threads[t]->getTargetList());
-        delete threads[t]; // the thread's list too
-    }
-*/
 
     return pyListTgt;
 }
-/*
-DecoderThread::DecoderThread(PyObject* py_list_src, int start_img, int end_img, int target_size, bool crop_to_square)
-: Thread(true), _py_list_src(py_list_src), _start_img(start_img), _end_img(end_img), _target_size(target_size), _crop_to_square(crop_to_square) {
-
-    _encode_params.push_back(CV_IMWRITE_JPEG_QUALITY);
-    _encode_params.push_back(JPEG_QUALITY);
-    _py_list_tgt = PyList_New(0);
-}
-
-DecoderThread::~DecoderThread(){
-    Py_DECREF(_py_list_tgt);
-}
-
-void* DecoderThread::run() {
-    for (int i = _start_img; i < _end_img; ++i) {
-        makeJPEG(i);
-    }
-    return NULL;
-}
-
-PyObject* DecoderThread::getTargetList() {
-    return _py_list_tgt;
-}
-*/
 void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt) {
     cv::Mat _resized_mat_buffer;
+    cv::cuda::GpuMat _resized_mat_buffer_gpu;
     std::vector<uchar> _output_jpeg_buffer; 
     std::vector<int> _encode_params;
     _encode_params.push_back(CV_IMWRITE_JPEG_QUALITY);
     _encode_params.push_back(JPEG_QUALITY);
+
     /*
      * Decompress JPEG
      */
@@ -109,6 +71,10 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
 
     cv::Mat decoded_mat = cv::imdecode(cv::Mat(src_vec), CV_LOAD_IMAGE_COLOR);
     assert(decoded_mat.channels() == 3);
+
+    // Load to GPU.
+    cv::cuda::GpuMat decoded_mat_gpu;
+    decoded_mat_gpu.upload(decoded_mat);
 
     /*
      * Resize
@@ -123,7 +89,8 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
     int interpolation = scale_factor == 1 ? cv::INTER_LINEAR
                       : scale_factor > 1 ? cv::INTER_CUBIC : cv::INTER_AREA;
 
-    cv::resize(decoded_mat, _resized_mat_buffer, cv::Size(new_width, new_height), 0, 0, interpolation);
+    cv::cuda::resize(decoded_mat_gpu, _resized_mat_buffer_gpu, cv::Size(new_width, new_height), 0, 0, interpolation);
+    _resized_mat_buffer_gpu.download(_resized_mat_buffer);
 
     /*
      * Conditionally crop and compress JPEG
@@ -146,3 +113,4 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
     }
     Py_DECREF(pyStr);
 }
+

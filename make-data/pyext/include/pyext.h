@@ -19,10 +19,10 @@
 
 #include <stdio.h>
 //#include <jpeglib.h>
+#include <opencv2/cudawarping.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs/imgcodecs_c.h>
 #include <Python.h>
-#include "../../../util/include/thread.h"
 
 #define JPEG_QUALITY      95
 
@@ -35,26 +35,5 @@ extern "C" {
 }
 PyObject* resizeJPEG(PyObject *self, PyObject *args);
 
-class DecoderThread : public Thread {
- protected:
-    PyObject* _py_list_src;
-    PyObject* _py_list_tgt;
-    int _start_img, _end_img;
-    int _target_size;
-    bool _crop_to_square;
-
-    cv::Mat _resized_mat_buffer;
-    std::vector<uchar> _output_jpeg_buffer;
-    std::vector<int> _encode_params;
-
-    void* run();
-    void makeJPEG(int idx);
-
- public:
-    DecoderThread(PyObject* py_list_src, int start_img, int end_img, int target_size, bool crop_to_square);
-    virtual ~DecoderThread();
-    PyObject* getTargetList();
-};
-
-
 #endif  // INCLUDE_PYEXT_H_
+

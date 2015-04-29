@@ -46,7 +46,7 @@ CROP_TO_SQUARE          = True
 OUTPUT_IMAGE_SIZE       = 256
 
 # Number of threads to use for JPEG decompression and image resizing.
-NUM_WORKER_THREADS      = 32
+NUM_WORKER_THREADS      = 1
 
 # Don't worry about these.
 OUTPUT_BATCH_SIZE = 3072

@@ -2,9 +2,10 @@
 #BSUB -J convnet-make-data 
 #BSUB -o output_file
 #BSUB -e error_file
-#BSUB -n 16
-#BSUB -q ht-10g
-#BSUB -R "span[ptile=8]"
+#BSUB -n 32
+#BSUB -q par-gpu
+#not BSUB -q ht-10g
+#BSUB -R "span[ptile=32]"
 #BSUB -cwd /home/vaskevich.o/eece5640/_project/convnet-nu-discovery/make-data
 ######## THIS IS A TEMPLATE FILE FOR TCP ENABLED MPI RUNS ON THE DISCOVERY CLUSTER ########
 #### #BSUB -n has a value equal to the given value for the -np option ####

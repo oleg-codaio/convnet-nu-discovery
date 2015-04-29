@@ -19,7 +19,7 @@
 
 using namespace std;
 
-void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt); 
+void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt, bool withGpu); 
 
 static PyMethodDef _MakeDataPyExtMethods[] = {{ "resizeJPEG", resizeJPEG, METH_VARARGS },
                                               { NULL, NULL }
@@ -43,17 +43,18 @@ PyObject* resizeJPEG(PyObject *self, PyObject *args) {
         return NULL;
     }
 
+    bool withGpu = cv::cuda::getCudaEnabledDeviceCount() > 0;
     int num_imgs = PyList_GET_SIZE(pyListSrc);
     PyObject* pyListTgt = PyList_New(0);
     omp_set_num_threads(numThreads);
     #pragma omp parallel for
     for (int t = 0; t < num_imgs; ++t) {
-        makeJPEG((PyObject*)pyListSrc, t, tgtImgSize, cropToSquare, pyListTgt);
+        makeJPEG((PyObject*)pyListSrc, t, tgtImgSize, cropToSquare, pyListTgt, withGpu);
     }
 
     return pyListTgt;
 }
-void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt) {
+void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt, bool withGpu) {
     cv::Mat _resized_mat_buffer;
     cv::cuda::GpuMat _resized_mat_buffer_gpu;
     std::vector<uchar> _output_jpeg_buffer; 
@@ -74,7 +75,9 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
 
     // Load to GPU.
     cv::cuda::GpuMat decoded_mat_gpu;
-    decoded_mat_gpu.upload(decoded_mat);
+    if (withGpu) {
+        decoded_mat_gpu.upload(decoded_mat);
+    }
 
     /*
      * Resize
@@ -89,8 +92,12 @@ void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_s
     int interpolation = scale_factor == 1 ? cv::INTER_LINEAR
                       : scale_factor > 1 ? cv::INTER_CUBIC : cv::INTER_AREA;
 
-    cv::cuda::resize(decoded_mat_gpu, _resized_mat_buffer_gpu, cv::Size(new_width, new_height), 0, 0, interpolation);
-    _resized_mat_buffer_gpu.download(_resized_mat_buffer);
+    if (withGpu) {
+        cv::cuda::resize(decoded_mat_gpu, _resized_mat_buffer_gpu, cv::Size(new_width, new_height), 0, 0, interpolation);
+        _resized_mat_buffer_gpu.download(_resized_mat_buffer);
+    } else {
+        cv::resize(decoded_mat, _resized_mat_buffer, cv::Size(new_width, new_height), 0, 0, interpolation);
+    }
 
     /*
      * Conditionally crop and compress JPEG

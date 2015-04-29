@@ -18,6 +18,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $DIR
 
 echo "Configuring Bash and Python files..."
+
 sed -i -E "s%work=\".*\"%work=\"${DIR}\"%g" make-data.bash
 sed -i -E "s%#BSUB -cwd.*%#BSUB -cwd ${DIR}%g" make-data.bash
 sed -i -E "s%scratch_username=\".*\"%scratch_username=\"$username\"%g" make-data.bash

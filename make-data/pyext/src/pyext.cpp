@@ -15,8 +15,11 @@
  */
 
 #include "../include/pyext.h"
+#include <omp.h>
 
 using namespace std;
+
+void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt); 
 
 static PyMethodDef _MakeDataPyExtMethods[] = {{ "resizeJPEG", resizeJPEG, METH_VARARGS },
                                               { NULL, NULL }
@@ -42,25 +45,31 @@ PyObject* resizeJPEG(PyObject *self, PyObject *args) {
 
     DecoderThread* threads[numThreads];
     int num_imgs = PyList_GET_SIZE(pyListSrc);
-    int num_imgs_per_thread = DIVUP(num_imgs, numThreads);
-    for (int t = 0; t < numThreads; ++t) {
-        int start_img = t * num_imgs_per_thread;
-        int end_img = min(num_imgs, (t+1) * num_imgs_per_thread);
-
-        threads[t] = new DecoderThread((PyObject*)pyListSrc, start_img, end_img, tgtImgSize, cropToSquare);
-        threads[t]->start();
-    }
-
+    //int num_imgs_per_thread = DIVUP(num_imgs, numThreads);
     PyObject* pyListTgt = PyList_New(0);
+    omp_set_num_threads(numThreads);
+    #pragma omp parallel for
+    for (int t = 0; t < num_imgs; ++t) {
+        //int start_img = t * num_imgs_per_thread;
+        //int end_img = min(num_imgs, (t+1) * num_imgs_per_thread);
+        makeJPEG((PyObject*)pyListSrc, t, tgtImgSize, cropToSquare, pyListTgt);
+
+        //threads[t] = new DecoderThread((PyObject*)pyListSrc, start_img, end_img, tgtImgSize, cropToSquare);
+        //threads[t]->start();
+    }
+/*
+    PyObject* pyListTgt = PyList_New(0);
+    #pragma omp parallel for
     for (int t = 0; t < numThreads; ++t) {
         threads[t]->join();
         PyList_Append(pyListTgt, threads[t]->getTargetList());
         delete threads[t]; // the thread's list too
     }
+*/
 
     return pyListTgt;
 }
-
+/*
 DecoderThread::DecoderThread(PyObject* py_list_src, int start_img, int end_img, int target_size, bool crop_to_square)
 : Thread(true), _py_list_src(py_list_src), _start_img(start_img), _end_img(end_img), _target_size(target_size), _crop_to_square(crop_to_square) {
 
@@ -83,8 +92,13 @@ void* DecoderThread::run() {
 PyObject* DecoderThread::getTargetList() {
     return _py_list_tgt;
 }
-
-void DecoderThread::makeJPEG(int idx) {
+*/
+void makeJPEG(PyObject* _py_list_src, int idx, int _target_size, bool _crop_to_square, PyObject* _py_list_tgt) {
+    cv::Mat _resized_mat_buffer;
+    std::vector<uchar> _output_jpeg_buffer; 
+    std::vector<int> _encode_params;
+    _encode_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    _encode_params.push_back(JPEG_QUALITY);
     /*
      * Decompress JPEG
      */
@@ -126,6 +140,9 @@ void DecoderThread::makeJPEG(int idx) {
 
     char* output_jpeg_buffer_ptr = reinterpret_cast<char*>(&_output_jpeg_buffer[0]);
     PyObject* pyStr = PyString_FromStringAndSize(output_jpeg_buffer_ptr, _output_jpeg_buffer.size());
-    PyList_Append(_py_list_tgt, pyStr);
+    #pragma omp critical
+    {
+        PyList_Append(_py_list_tgt, pyStr);
+    }
     Py_DECREF(pyStr);
 }

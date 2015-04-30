@@ -75,7 +75,7 @@ This is the section of code that we parallelized. In order to run the different 
     CUDA
     
         To run with CUDA you must change the queue in the make-data.bash script to be par-gpu.
-        ./make-data/make-data.sh vaskevich.o <number of MPI processes> 32 <any number>
+        ./make-data/make-data.sh vaskevich.o <number of MPI processes> 32 1
     
 
 Training

@@ -52,18 +52,28 @@ logging back into the cluster.
     ./make-data.sh vaskevich.o
 
 This is the section of code that we parallelized. In order to run the different configurations please read the following instructions:
+    
     The data generation script has the following inputs:
+
         <username> The name of the directory in scratch that contains the data.
         <number of MPI processes> The number of processes to use for MPI (n in bash scripts).
-        <span valu> The value for span, to be used with MPI.
+        <span value> The value for span, to be used with MPI.
         <number of OpenMP threads> The number of threads for OpenMP to use.
+
     Sequential:
+    
         ./make-data/make-data.sh vaskevich.o 1 1 8
+        
     MPI alone:
+    
         ./make-data/make-data.sh vaskevich.o <number of processes> <span value> 8
+        
     MPI with OpenMP
+    
         ./make-data/make-data.sh vaskevich.o <number of MPI processes> <span value> <number of OpenMP threads>
+        
     CUDA
+    
         To run with CUDA you must change the queue in the make-data.bash script to be par-gpu.
         ./make-data/make-data.sh vaskevich.o <number of MPI processes> 32 <any number>
     
